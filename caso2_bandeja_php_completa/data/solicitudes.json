@@ -1,0 +1,22 @@
+[
+{"id":"REQ-001","cliente":"Comercial Andina","asunto":"Reclamo por factura cobrada dos veces","mensaje":"Solicito revisión porque la factura fue cobrada dos veces.","hora":"08:02"},
+{"id":"REQ-002","cliente":"Carlos Pérez","asunto":"No puedo ingresar al portal","mensaje":"El sistema rechaza mi contraseña y necesito entrar con urgencia.","hora":"08:05"},
+{"id":"REQ-003","cliente":"Distribuciones Norte","asunto":"Cotización para servicio mensual","mensaje":"Necesitamos una cotización para contratar el servicio.","hora":"08:07"},
+{"id":"REQ-004","cliente":"Laura Gómez","asunto":"Consulta sobre configuración","mensaje":"¿Cómo puedo configurar el equipo para conectarlo a la red?","hora":"08:11"},
+{"id":"REQ-005","cliente":"Operaciones Delta","asunto":"Soporte: servicio caído","mensaje":"El servicio está caído en nuestra sede principal y afecta la operación.","hora":"08:14"},
+{"id":"REQ-006","cliente":"Ana Ruiz","asunto":"Solicitud de información","mensaje":"Quiero conocer los horarios y canales de atención.","hora":"08:18"},
+{"id":"REQ-007","cliente":"Grupo Centro","asunto":"Reclamo por demora en atención","mensaje":"Presento un reclamo porque mi solicitud lleva varios días sin respuesta.","hora":"08:22"},
+{"id":"REQ-008","cliente":"TecnoSur","asunto":"Error técnico en plataforma","mensaje":"Aparece un error al cargar el módulo de reportes.","hora":"08:25"},
+{"id":"REQ-009","cliente":"Inversiones Sol","asunto":"Solicitud comercial","mensaje":"Deseamos conocer planes, precios y condiciones comerciales.","hora":"08:29"},
+{"id":"REQ-010","cliente":"Logística ABC","asunto":"Cambio de datos de operación","mensaje":"Necesitamos actualizar los datos de la sede para continuar operando.","hora":"08:33"},
+{"id":"REQ-011","cliente":"Marta Díaz","asunto":"Consulta de funcionamiento","mensaje":"Tengo dudas sobre cómo funciona el servicio contratado.","hora":"08:37"},
+{"id":"REQ-012","cliente":"Hotel Central","asunto":"Urgente: falla del servicio","mensaje":"La plataforma no funciona y tenemos atención de clientes en curso.","hora":"08:41"},
+{"id":"REQ-013","cliente":"Servicios Omega","asunto":"Cotización corporativa","mensaje":"Solicitamos propuesta económica para una solución corporativa.","hora":"08:46"},
+{"id":"REQ-014","cliente":"Pedro Salas","asunto":"Reclamo por respuesta incompleta","mensaje":"La respuesta recibida no solucionó mi reclamo anterior.","hora":"08:51"},
+{"id":"REQ-015","cliente":"Fundación Vida","asunto":"Ayuda con configuración","mensaje":"Necesitamos apoyo para configurar el acceso de los usuarios.","hora":"08:55"},
+{"id":"REQ-016","cliente":"Alimentos del Valle","asunto":"Solicitud de soporte operativo","mensaje":"Necesitamos apoyo para realizar un procedimiento operativo.","hora":"09:01"},
+{"id":"REQ-017","cliente":"María Torres","asunto":"Pregunta sobre servicio","mensaje":"¿Qué requisitos debo cumplir para solicitar el servicio?","hora":"09:06"},
+{"id":"REQ-018","cliente":"Industrias Nova","asunto":"Reclamo urgente por interrupción","mensaje":"Presentamos un reclamo urgente porque la interrupción está afectando la producción.","hora":"09:12"},
+{"id":"REQ-019","cliente":"Constructora 360","asunto":"Solicitud de propuesta","mensaje":"Queremos recibir información comercial y una propuesta de servicio.","hora":"09:18"},
+{"id":"REQ-020","cliente":"Red Integral","asunto":"Problema de conexión","mensaje":"Tenemos problemas de conexión y requerimos soporte técnico.","hora":"09:24"}
+]
