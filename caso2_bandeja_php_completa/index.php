@@ -16,7 +16,9 @@ function clasificarSolicitud(string $asunto, string $mensaje): array
         'Soporte operativo' => ['soporte operativo', 'procedimiento operativo', 'datos de operación', 'sede', 'operación'],
         'Solicitud de cliente' => ['solicitud de información', 'pregunta sobre servicio', 'requisitos', 'horarios', 'canales de atención']
     ];
-    $categoria = 'Solicitud de cliente';
+    // Control de riesgo: si ninguna regla coincide, el caso NO se clasifica solo.
+    // Se marca para revisión manual del equipo de bandeja en vez de adivinar (ver diagrama TO-BE).
+    $categoria = null;
     foreach ($reglas as $nombre => $palabras) {
         foreach ($palabras as $palabra) {
             if (mb_strpos($texto, $palabra, 0, 'UTF-8') !== false) {
@@ -25,6 +27,7 @@ function clasificarSolicitud(string $asunto, string $mensaje): array
             }
         }
     }
+    $automatica = $categoria !== null;
     $areas = [
         'Reclamo' => 'Servicio al cliente',
         'Consulta técnica' => 'Soporte técnico',
@@ -33,20 +36,30 @@ function clasificarSolicitud(string $asunto, string $mensaje): array
         'Solicitud de cliente' => 'Atención al cliente'
     ];
     $esUrgente = preg_match('/urgente|urgencia|caído|interrupción|afectando la producción|afecta la operación|en curso/i', $texto);
-    if ($esUrgente) {
+    if (!$automatica) {
+        // Requiere revisión: sin regla clara, prioridad media por defecto salvo que se detecte urgencia.
+        $categoria = 'Sin clasificar (revisión manual)';
+        $area = 'Equipo de bandeja';
+        $prioridad = $esUrgente ? 'Crítica' : 'Media';
+        $tiempo = $esUrgente ? 1 : 5;
+    } elseif ($esUrgente) {
         $prioridad = 'Crítica';
         $tiempo = 1;
+        $area = $areas[$categoria];
     } elseif ($categoria === 'Reclamo') {
         $prioridad = 'Alta';
         $tiempo = 3;
+        $area = $areas[$categoria];
     } elseif ($categoria === 'Consulta técnica' || $categoria === 'Soporte operativo') {
         $prioridad = 'Media';
         $tiempo = 5;
+        $area = $areas[$categoria];
     } else {
         $prioridad = 'Baja';
         $tiempo = 10;
+        $area = $areas[$categoria];
     }
-    return ['categoria' => $categoria, 'area' => $areas[$categoria], 'prioridad' => $prioridad, 'tiempo' => $tiempo];
+    return ['categoria' => $categoria, 'area' => $area, 'prioridad' => $prioridad, 'tiempo' => $tiempo, 'automatica' => $automatica];
 }
 function clasePrioridad(string $p): string
 {
@@ -90,6 +103,8 @@ foreach ($resultados as $r) {
     $areas[$r['area']] = ($areas[$r['area']] ?? 0) + 1;
 }
 $promedioAsignacion = $total ? array_sum(array_column($resultados, 'tiempo')) / $total : 0;
+$revisionManual = count(array_filter($resultados, fn($r) => !$r['automatica']));
+$porcRevision = $total ? ($revisionManual / $total) * 100 : 0;
 $detalleId = $_GET['detalle'] ?? '';
 $detalle = null;
 foreach ($resultados as $s) {
@@ -117,12 +132,16 @@ foreach ($resultados as $s) {
         </div>
         <div class="technology">PHP + HTML + CSS + JSON</div>
     </header>
+    <nav class="subnav">
+        <a href="analisis.php">Análisis del proceso</a>
+        <a href="index.php" class="active">Bandeja en vivo (demo funcional)</a>
+    </nav>
     <main class="container">
         <section class="metrics">
             <article class="metric"><span>Volumen total</span><strong><?= $total ?></strong><small>solicitudes de ejemplo</small></article>
             <article class="metric"><span>Críticas + altas</span><strong><?= $criticas + $altas ?></strong><small><?= $criticas ?> críticas · <?= $altas ?> altas</small></article>
             <article class="metric"><span>Tiempo promedio</span><strong><?= number_format($promedioAsignacion, 1, ',', '.') ?> min</strong><small>estimado de asignación</small></article>
-            <article class="metric"><span>Procesamiento PHP</span><strong><?= number_format($tiempoProcesamientoMs, 2, ',', '.') ?> ms</strong><small>tiempo del clasificador</small></article>
+            <article class="metric<?= $revisionManual ? ' highlight' : '' ?>"><span>Revisión manual</span><strong><?= $revisionManual ?></strong><small><?= number_format($porcRevision, 0) ?> % · no coincidió con ninguna regla</small></article>
         </section>
         <section class="panel">
             <div class="panel-title">
@@ -168,6 +187,7 @@ foreach ($resultados as $s) {
                                 <th>Área responsable</th>
                                 <th>Urgencia</th>
                                 <th>Asignación</th>
+                                <th>Origen</th>
                                 <th>Detalle</th>
                             </tr>
                         </thead>
@@ -180,6 +200,7 @@ foreach ($resultados as $s) {
                                     <td><?= htmlspecialchars($r['area']) ?></td>
                                     <td><span class="pill <?= clasePrioridad($r['prioridad']) ?>"><?= htmlspecialchars($r['prioridad']) ?></span></td>
                                     <td><strong><?= $r['tiempo'] ?> min</strong></td>
+                                    <td><span class="pill <?= $r['automatica'] ? 'auto' : 'review' ?>"><?= $r['automatica'] ? 'Automática' : 'Revisión' ?></span></td>
                                     <td><a class="detail-link" href="?detalle=<?= urlencode($r['id']) ?>">Ver</a></td>
                                 </tr><?php endforeach; ?>
                         </tbody>
@@ -212,6 +233,7 @@ foreach ($resultados as $s) {
                     <div><span>Área responsable</span><strong><?= htmlspecialchars($detalle['area']) ?></strong></div>
                     <div><span>Urgencia</span><strong><span class="pill <?= clasePrioridad($detalle['prioridad']) ?>"><?= htmlspecialchars($detalle['prioridad']) ?></span></strong></div>
                     <div><span>Tiempo estimado</span><strong><?= $detalle['tiempo'] ?> minutos</strong></div>
+                    <div><span>Origen de la clasificación</span><strong><span class="pill <?= $detalle['automatica'] ? 'auto' : 'review' ?>"><?= $detalle['automatica'] ? 'Automática (coincidió con una regla)' : 'Revisión manual (sin regla coincidente)' ?></span></strong></div>
                 </div>
                 <div class="message"><span>ASUNTO</span>
                     <h3><?= htmlspecialchars($detalle['asunto']) ?></h3><span>MENSAJE</span>
